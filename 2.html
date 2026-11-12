@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>任务5.1.2 绘制时钟仪表盘</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #f7f8fa;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        #main {
+            width: 700px;
+            height: 560px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+    </style>
+</head>
+<body>
+<div id="main"></div>
+<script>
+    var myChart = echarts.init(document.getElementById('main'));
+
+    // 表盘：只显示刻度、刻度标签和指针固定点，不显示指针
+    var dialSeries = {
+        type: 'gauge',
+        center: ['50%', '50%'],
+        radius: '78%',
+        min: 0,
+        max: 12,
+        startAngle: 90,
+        endAngle: -270,
+        splitNumber: 12,
+        animation: false,
+        axisLine: {
+            lineStyle: { width: 12, color: [[1, '#404040']] }
+        },
+        axisTick: {
+            length: 5,
+            splitNumber: 5,
+            lineStyle: { color: '#404040', width: 1 }
+        },
+        splitLine: {
+            length: 12,
+            lineStyle: { color: '#404040', width: 2 }
+        },
+        axisLabel: {
+            distance: 16,
+            fontSize: 14,
+            color: '#333',
+            // 0 点位置不显示文字，12 正好在正上方
+            formatter: function (value) {
+                return value === 0 ? '' : value;
+            }
+        },
+        pointer: { show: false },
+        // 指针固定点：表盘中央的大圆点
+        anchor: {
+            show: true,
+            showAbove: true,
+            size: 55,
+            offsetCenter: [0, '-12%'],
+            itemStyle: { color: '#8c8c8c', borderColor: '#8c8c8c' }
+        },
+        title: { show: false },
+        detail: { show: false },
+        data: []
+    };
+
+    // 时针 / 分针 / 秒针：共用 0~12 的刻度，用当前时间换算指针角度
+    function handSeries(name, width, color, length) {
+        return {
+            name: name,
+            type: 'gauge',
+            center: ['50%', '50%'],
+            radius: '78%',
+            min: 0,
+            max: 12,
+            startAngle: 90,
+            endAngle: -270,
+            splitNumber: 12,
+            animation: false,
+            axisLine: { show: false },
+            axisTick: { show: false },
+            splitLine: { show: false },
+            axisLabel: { show: false },
+            pointer: {
+                show: true,
+                length: length,
+                width: width,
+                itemStyle: { color: color }
+            },
+            anchor: { show: false },
+            title: { show: false },
+            detail: { show: false },
+            data: [{ value: 0, name: name }]
+        };
+    }
+
+    var option = {
+        // 系列颜色：与指针颜色保持一致，图例颜色才一致
+        color: ['#404040', '#c0911f', '#c0911f', '#c0911f'],
+        // 标题组件
+        title: {
+            text: '电子时钟',
+            left: 'center',
+            top: 15,
+            textStyle: { fontSize: 22, color: '#333' }
+        },
+        // 提示框组件
+        tooltip: {
+            formatter: function (params) {
+                return params.seriesName + '：' + params.value.toFixed(2);
+            }
+        },
+        // 图例组件
+        legend: {
+            bottom: 8,
+            left: 'center',
+            data: ['时针', '分针', '秒针'],
+            textStyle: { color: '#666' }
+        },
+        // 工具箱组件
+        toolbox: {
+            right: 20,
+            top: 15,
+            feature: {
+                saveAsImage: { title: '保存为图片', pixelRatio: 2 },
+                restore: { title: '还原' },
+                dataView: { title: '数据视图', readOnly: true }
+            }
+        },
+        series: [
+            dialSeries,
+            handSeries('时针', 8, '#c0911f', '38%'),
+            handSeries('分针', 5, '#c0911f', '55%'),
+            handSeries('秒针', 2, '#c0911f', '72%')
+        ]
+    };
+
+    // 读取当前时间，换算成仪表盘 0~12 刻度上的数值
+    function renderClock() {
+        var now = new Date();
+        var hourValue = (now.getHours() % 12) + now.getMinutes() / 60 + now.getSeconds() / 3600;
+        var minuteValue = (now.getMinutes() + now.getSeconds() / 60) / 5;
+        var secondValue = (now.getSeconds() + now.getMilliseconds() / 1000) / 5;
+
+        myChart.setOption({
+            series: [
+                {},
+                { data: [{ value: hourValue, name: '时针' }] },
+                { data: [{ value: minuteValue, name: '分针' }] },
+                { data: [{ value: secondValue, name: '秒针' }] }
+            ]
+        });
+    }
+
+    myChart.setOption(option);
+    renderClock();
+    setInterval(renderClock, 1000);
+
+    window.addEventListener('resize', function () {
+        myChart.resize();
+    });
+</script>
+</body>
+</html>

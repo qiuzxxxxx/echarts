@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>任务5.1.1 绘制进度仪表盘</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #f7f8fa;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        #main {
+            width: 700px;
+            height: 520px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+    </style>
+</head>
+<body>
+<div id="main"></div>
+<script>
+    var myChart = echarts.init(document.getElementById('main'));
+
+    var option = {
+        // 标题组件
+        title: {
+            text: '项目实际进度（%）',
+            subtext: '仅供参考',
+            left: 30,
+            top: 20,
+            textStyle: { fontSize: 18, color: '#333', fontWeight: 'bold' },
+            subtextStyle: { fontSize: 12, color: '#999' }
+        },
+        // 提示框组件
+        tooltip: {
+            formatter: '{b}：{c}%'
+        },
+        // 图例组件
+        legend: {
+            top: 22,
+            right: 30,
+            data: ['项目进度'],
+            textStyle: { color: '#666' }
+        },
+        // 工具箱组件
+        toolbox: {
+            right: 20,
+            top: 70,
+            feature: {
+                saveAsImage: { title: '保存为图片', pixelRatio: 2 },
+                restore: { title: '还原' },
+                dataView: { title: '数据视图', readOnly: true }
+            }
+        },
+        series: [{
+            name: '项目进度',
+            type: 'gauge',
+            center: ['50%', '60%'],
+            radius: '65%',
+            min: 0,
+            max: 100,
+            // 仪表盘起始角度、结束角度
+            startAngle: 225,
+            endAngle: -45,
+            splitNumber: 10,
+            // 仪表盘轴线（按百分比分段变色）
+            axisLine: {
+                lineStyle: {
+                    width: 20,
+                    color: [
+                        [0.15, '#7fd9df'],
+                        [0.7, '#1739ee'],
+                        [0.9, '#f4e600'],
+                        [1, '#e66b63']
+                    ]
+                }
+            },
+            // 刻度线、分隔线不显示
+            axisTick: { show: false },
+            splitLine: { show: false },
+            // 刻度标签
+            axisLabel: {
+                distance: 12,
+                color: '#333',
+                fontSize: 12,
+                formatter: '{value}'
+            },
+            // 指针
+            pointer: {
+                show: true,
+                length: '55%',
+                width: 5,
+                itemStyle: { color: '#1739ee' }
+            },
+            // 不显示指针固定点
+            anchor: { show: false },
+            // 仪表盘标题（数据项名称）
+            title: {
+                show: true,
+                offsetCenter: [0, '35%'],
+                fontSize: 15,
+                color: '#555'
+            },
+            // 仪表盘详情（数据值）
+            detail: {
+                show: true,
+                offsetCenter: [0, '58%'],
+                fontSize: 32,
+                color: '#333',
+                formatter: '{value}'
+            },
+            data: [{ value: 64, name: '实际进度' }]
+        }]
+    };
+
+    myChart.setOption(option);
+
+    window.addEventListener('resize', function () {
+        myChart.resize();
+    });
+</script>
+</body>
+</html>
